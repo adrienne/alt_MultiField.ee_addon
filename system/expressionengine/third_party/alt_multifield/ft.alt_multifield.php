@@ -319,16 +319,24 @@ EOJ;
      * Display Tag
      */
 	
-    function replace_tag($seodata, $params=array(), $tagdata=FALSE)
+    function replace_tag($multifielddata, $params=array(), $tagdata=FALSE)
     {
         if (!$tagdata) // Single tag
         {
-			$output = '';
+			$output = 'No single tag is available; please use tag pair!';
     	}
     	else // Tag pair
     	{
+            // Merge in the labels
+            $fieldsettings = $this->settings['options'];
+            $fieldoutputdata = array();
+            foreach($multifielddata as $key=>$row) {
+                $fieldoutputdata[$key] = $row;
+                $klabel = $key.":label";
+                $fieldoutputdata[$klabel] = $fieldsettings[$key]['label'];
+            }
             // Replace the variables            
-            $output = $this->EE->TMPL->parse_variables($tagdata, array($seodata));
+            $output = $this->EE->TMPL->parse_variables($tagdata, array($fieldoutputdata));
     	}
             
         return $output;
