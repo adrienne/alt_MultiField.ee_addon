@@ -1,12 +1,11 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH')) { exit('No direct script access allowed'); }
 
-if (! defined('FIELDTYPE_VERSION'))
-{
-    // get the version from config.php
+if (!defined('FIELDTYPE_VERSION')) {
+    // get the version info from config.php
     require PATH_THIRD.'alt_multifield/alt_multifield_config.php';
     define('FIELDTYPE_VERSION', $config['version']);
     define('FIELDTYPE_NAME', $config['name']);
-}
+	}
 
 /**
  * ALT MultiField Class
@@ -19,42 +18,37 @@ if (! defined('FIELDTYPE_VERSION'))
  * VZ Address fieldtype, located here: https://github.com/elivz/vz_address.ee_addon/
  *
  */
- 
+
 class Alt_multifield_ft extends EE_Fieldtype {
 
     public $info = array(
         'name'      => FIELDTYPE_NAME,
         'version'   => FIELDTYPE_VERSION,
-    );
-	    
+		);
     var $has_array_data = TRUE;
 	var $settings_exist = 'y';
     var $settings = array();
-    
-  
+
+
 	/**
 	 * Fieldtype Constructor
 	 */
-	function Alt_multifield_ft()
-	{
+	function Alt_multifield_ft() {
         parent::EE_Fieldtype();
 
         // Create cache
-        if (! isset($this->EE->session->cache[__CLASS__]))
-        {
+        if (!isset($this->EE->session->cache[__CLASS__])) {
             $this->EE->session->cache[__CLASS__] = array('css_and_js' => FALSE,);
-        }
+			}
         $this->cache =& $this->EE->session->cache[__CLASS__];
 
-	}
+		} // end CONSTRUCTOR
 	
 	/**
 	 * Include the CSS styles, but only once
 	 */
-	private function _include_css_and_js()
-	{
-        if ( !$this->cache['css_and_js'] )
-        {
+	private function _include_css_and_js() {
+        if ( !$this->cache['css_and_js'] ) {
 			$styling = <<<EOS
 			\n\n
 			<style type="text/css">
@@ -63,23 +57,23 @@ class Alt_multifield_ft extends EE_Fieldtype {
 					margin: 0; padding: 0;
 					list-style-type: none;
 					}
-                .alt-multifield { 
+                .alt-multifield {
 					padding-bottom: 0.5em;
 					}
-                .alt-multifield label { 
-					display:block; 
+                .alt-multifield label {
+					display:block;
 					}
-                .alt-multifield input { 
-					width:96.5%; 
-					padding:4px; 
+                .alt-multifield input {
+					width:96.5%;
+					padding:4px;
 					}
 				.alt-multifield-meta_keywords-field,
-				.alt-multifield-meta_description-field { 
-					float: left; 
-					width: 50%; 
+				.alt-multifield-meta_description-field {
+					float: left;
+					width: 50%;
 					}
-                .alt-multifield textarea { 
-					width: 95%; 
+                .alt-multifield textarea {
+					width: 95%;
 					}
             </style>\n\n
 EOS;
@@ -99,14 +93,13 @@ EOJ;
             $this->EE->cp->add_to_foot($scripting);
         	
         	$this->cache['css_and_js'] = TRUE;
-        }
-    }
+			}
+		} // end private function _include_css_and_js()
 	
 	/**
 	 * Display Field Settings
 	 */
-	function display_settings($data)
-	{
+	function display_settings($data) {
 		// load the language file
 		$this->EE->lang->loadfile('alt_multifield');
 		$this->EE->table->add_row(
@@ -119,80 +112,75 @@ EOJ;
 			. lang('alt_multifield_styles_examples'),
 			'<textarea id="alt_multifield_styles" name="alt_multifield_styles" rows="24">'.$this->_styles_setting($data).'</textarea>'
 			);
-	}
+		} // end function display_settings($data)
 	
 	/**
 	 * Options Setting Value
 	 */
-	private function _options_setting($settings)
-	{
+	private function _options_setting($settings) {
 		$r = '';
 
-		if (isset($settings['options']))
-		{
-			foreach($settings['options'] as $name => $stuff)
-			{
+		if (isset($settings['options'])) {
+			foreach($settings['options'] as $name => $stuff) {
 				if ($r !== '') $r .= "\n";
 				$r .= $name;
 				$r .= ' : '.$stuff['label'];
 				$r .= ' : '.$stuff['type'];
 				if (isset($settings['default']) && $settings['default'] == $name) $r .= ' *';
+				}
 			}
-		}
 
 		return $r;
-	}
+		} // end private function _options_setting($settings)
 	
 	/**
-	 * Options Setting Value
+	 * Styles Setting Value
 	 */
-	private function _styles_setting($settings)
-	{
+	private function _styles_setting($settings) {
 		$r = '';
 
-		if (isset($settings['styles']))
-		{
-			foreach($settings['styles'] as $key => $value)
-			{
+		if (isset($settings['styles'])) {
+			foreach($settings['styles'] as $key => $value) {
 				$r .= $value;
+				}
 			}
-		}
 
 		return $r;
-	}
+		} // end private function _styles_setting($settings)
 	
 	/**
 	 * Save Field Settings
 	 */
-	function save_settings($data)
-	{
+	function save_settings($data) {
 		$options = $this->EE->input->post('alt_multifield_options');
 		$styles = $this->EE->input->post('alt_multifield_styles');
 
 		return $this->_save_settings($options,$styles);
-	}
+		} // end function save_settings($data)
 
 	/**
 	 * Save Settings
 	 */
-	private function _save_settings($options = '',$styles = '')
-	{
+	private function _save_settings($options = '',$styles = '') {
 		$r = array('options' => array(),'styles' => array());
 
 		$options = preg_split('/[\r\n]+/', $options);
 		foreach($options as &$option) {
 			// default?
-			if ($default = (substr($option, -1) == '*')) $option = substr($option, 0, -1);
-
+			if ($default = (substr($option, -1) == '*')) {
+				$option = substr($option, 0, -1);
+				}
 			$option_parts = preg_split('/\s:\s/', $option, 3);
 			$option_name  = (string) trim($option_parts[0]);
 			$option_label = (string) trim($option_parts[1]);
 			$option_type = ( isset($option_parts[2]) && (preg_match('/^(textarea|text|tel|email|url|number|date)$/i',trim($option_parts[2])) > 0) )
-							? (string) trim($option_parts[2]) 
+							? (string) trim($option_parts[2])
 							: 'text';
 
 			$r['options'][$option_name] = array('label' => $option_label, 'type' => $option_type);
-			if ($default) $r['default'] = $option_name;
+			if ($default) {
+				$r['default'] = $option_name;
+				}
 			}
 		
 		$styles = preg_split('/\}/', $styles);
@@ -204,7 +192,7 @@ EOJ;
 			}
 
 		return $r;
-	}
+		} // end private function _save_settings($options = '',$styles = '')
 
 
 	// --------------------------------------------------------------------
@@ -213,8 +201,7 @@ EOJ;
 	/**
      * Generate the publish page UI
      */
-    private function _multi_form($name, $data, $is_cell=FALSE)
-    {
+    private function _multi_form($name, $data, $is_cell=FALSE) {
 		$this->EE->load->helper('form');
 		$this->EE->lang->loadfile('alt_multifield');
 		
@@ -231,13 +218,12 @@ EOJ;
 			$styleblock .= $stylevalue;
 			$styleblock .= "\n";
 			}
-        
+
         // Set default values
         $data = unserialize(htmlspecialchars_decode($data));
         if (!is_array($data)) $data = array();
 
-        foreach($fields as $field => $stuff)
-        {
+        foreach($fields as $field => $stuff) {
             $form .= '<li class="alt-multifield alt-multifield-'.$field.($is_cell ? '-cell' : '-field').' alt-multifield-box-type-'.$stuff['type'].'">';
             $form .= "\n".form_label($stuff['label'])."\n";
 			
@@ -268,26 +254,25 @@ EOJ;
 				$form .= "\n";
 				}
             $form .= "</li>\n";
-        }
-        
+			}
+
 		$form .= "</ol>";
 		$styleblock .= "</style>\n\n";
 		
 		$this->EE->cp->add_to_head($styleblock);
 		
         return $form;
-    }
-    
+		} // end private function _multi_form($name, $data, $is_cell=FALSE)
+
     /**
      * Display Field
      */
-    function display_field($field_data)
-    {
+    function display_field($field_data) {
         return $this->_multi_form($this->field_name, $field_data);
-    }
+		} // end function display_field($field_data)
 	
 	// --------------------------------------------------------------------
-    
+
     /**
      * Save Field
      */
@@ -295,7 +280,7 @@ EOJ;
     {
     	return serialize($data);
     }
-    
+
     /**
      * Save Cell
      */
@@ -319,29 +304,73 @@ EOJ;
      * Display Tag
      */
 	
-    function replace_tag($multifielddata, $params=array(), $tagdata=FALSE)
-    {
-        if (!$tagdata) // Single tag
-        {
-			$output = 'No single tag is available; please use tag pair!';
-    	}
-    	else // Tag pair
-    	{
-            // Merge in the labels
-            $fieldsettings = $this->settings['options'];
-            $fieldoutputdata = array();
-            foreach($multifielddata as $key=>$row) {
-                $fieldoutputdata[$key] = $row;
-                $klabel = $key.":label";
-                $fieldoutputdata[$klabel] = $fieldsettings[$key]['label'];
-            }
-            // Replace the variables            
-            $output = $this->EE->TMPL->parse_variables($tagdata, array($fieldoutputdata));
-    	}
-            
-        return $output;
-    } 
+    function replace_tag($multifielddata, $params=array(), $tagdata=FALSE) {
+	
+		$mystyle = isset($params['style']) ? $params['style'] : 'table';
+        $myclasses = isset($params['rowclasses']) ? explode('|',$params['rowclasses']) : explode('|','odd|even');
+        $show_empty = isset($params['show_empty']) ? $params['show_empty'] : 'no';
+        $include_wrapper = isset($params['include_wrapper']) ? $params['include_wrapper'] : 'no';
+        $output = "";
+        $fieldsettings = $this->settings['options'];
 
+		// Merge in the labels
+		$fieldoutputdata = array();
+		foreach($multifielddata as $key=>$row) {
+			if(isset($fieldsettings[$key])) { // checks that key still exists in settings
+				$fieldoutputdata[$key] = $row;
+				$klabel = $key.":label";
+                $ktype = $key.":type";
+				$fieldoutputdata[$klabel] = $fieldsettings[$key]['label'];
+				$fieldoutputdata[$ktype] = $fieldsettings[$key]['type'];
+				}
+			}
+		
+				
+        if (!$tagdata) { // Single tag
+			$myclasscopy = $myclasses;
+            $output .= ($include_wrapper == "yes") ? "<$mystyle>" : "";
+			foreach($multifielddata as $key=>$row) {
+				if(isset($fieldsettings[$key]) && ($row != "" || $show_empty == 'yes')) { 	
+				// checks that key still exists in settings, AND that row is not empty (unless show_empty param is yes)
+					$mylabel = $fieldoutputdata[$key.':label'];
+					$mytype = $fieldoutputdata[$key.':type'];
+					$myvalue = $fieldoutputdata[$key];
+					$myclass = array_shift($myclasscopy); // take OFF top class of classes array to use
+					$output .= $this->_make_something($mystyle,$mylabel,$myvalue,$myclass);
+					$myclasscopy[] = $myclass; // put used class back at END of classes array
+					}
+				}
+            $output .= ($include_wrapper == "yes") ? "</$mystyle>" : "";
+			}
+    	else { // Tag pair
+            $output = $this->EE->TMPL->parse_variables($tagdata, array($fieldoutputdata)); // Replace the variables
+			}
+
+        return $output;
+		} // end function replace_tag($multifielddata, $params=array(), $tagdata=FALSE)
+
+	
+	private function _make_something($thing,$thinglabel,$thingvalue,$thingclass='',$thingtype='text') {
+		$returned = "";
+		switch ($thing) {
+                case 'table' :
+					$returned .= "\n<tr class=\"$thingclass\">\n";
+					$returned .= "<td class=\"label\">$thinglabel</td>\n";
+					$returned .= "<td class=\"value\">$thingvalue</td>\n";
+					$returned .= "</tr>\n";
+					break;
+				case 'dl' :
+                    $returned .= "\n";
+					$returned .= "<dt class=\"$thingclass label\">$thinglabel</dt>\n";
+					$returned .= "<dd class=\"$thingclass value\">$thingvalue</dd>\n";
+					break;
+				default :
+                    break;
+				}
+	
+		return $returned;
+		} // end private function _make_someting($item,$rowclass)
+	
 }
 
 /* End of file ft.alt_multifield.php */
