@@ -85,13 +85,55 @@ a couple of different useful formats.
 
 The syntax for the single tag looks like this:
 
-    {my_multifield style="table" show_empty="yes" include_wrapper="yes" rowclasses="odd|even"}
+    {my_multifield style="table" show_empty="yes" include_wrapper="yes" subfield_classes="odd|even"}
     
 * The `style` parameter currently has two values:  `table`, which outputs table rows, and `dl`, which outputs 
 a definition list. If you fail to include a `style` parameter it will default to `table`.
 * The `show_empty` parameter determines whether the tag outputs subfields whose values are empty; it defaults to `no`.
-* The `include_wrapper` parameter determines whether wrapper `&lt;table&gt;&lt;/table&gt;`
+* The `include_wrapper` parameter determines whether wrapper `<table></table>` or `<dl></dl>` tags are output at the 
+beginning and end of the loop; it defaults to `yes`.
+* The `subfield_classes` parameter takes a **pipe-delimited** list of classes that will be applied in order to the 
+subfields as it loops through. It works much like the EE `{switch}` tag. In the example above, the first subfield will 
+get class `odd` as it loops, the second will get class `even`, the third will get `odd` again, and so forth. If you 
+do not add any classes to this loop, all of your subfields will get class `multifield`. Note that the value of the 
+`style` tag may cause additional classes to be applied to portions of the output as well!
 
+#### Example Tag Outputs ####
+
+The following single tag, applied to our example field above:
+
+    {my_multifield style="dl" show_empty="yes" include_wrapper="yes"}
+    
+Will return the following output:
+
+    <dl>
+        <dt class="multifield label">A Subfield</dt>
+            <dd class="multifield value">(some value)</dd>
+        <dt class="multifield label">Another Subfield</dt>
+            <dd class="multifield value">(some value)</dd>
+        <dt class="multifield label">An Arbitrary Date</dt>
+            <dd class="multifield value">YYYY-MM-DD hh:ii:ss aa</dd>
+    </dl>
+
+The following single tag, applied to our example field above:
+
+    {my_multifield style="table" show_empty="yes" include_wrapper="no" subfield_classes="odd|even"}
+    
+Will return the following output (note that `include_wrapper` is set to `no`, meaning the wrapper `<table></table>` tag 
+is *not* returned!):
+
+        <tr class="odd">
+            <td class="label">A Subfield</td>
+            <td class="value">(some value)</td>
+        </tr>
+        <tr class="even">
+            <td class="label">Another Subfield</td>
+            <td class="value">(some value)</td>
+        </tr>
+        <tr class="even">
+            <td class="label">An Arbitrary Date</td>
+            <td class="value">YYYY-MM-DD hh:ii:ss aa</td>
+        </tr>
 
 **NOTE:** Dates are output as standard MySQL dates and there is currently no built-in formatting capability. There are other
 plugins that will allow you to format arbitrary dates using EE format codes; use them with the tag pair syntax!

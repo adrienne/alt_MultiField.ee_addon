@@ -307,9 +307,9 @@ EOJ;
     function replace_tag($multifielddata, $params=array(), $tagdata=FALSE) {
 	
 		$mystyle = isset($params['style']) ? $params['style'] : 'table';
-        $myclasses = isset($params['rowclasses']) ? explode('|',$params['rowclasses']) : explode('|','odd|even');
+        $myclasses = isset($params['subfield_classes']) ? explode('|',$params['subfield_classes']) : explode('|',"multifield");
         $show_empty = isset($params['show_empty']) ? $params['show_empty'] : 'no';
-        $include_wrapper = isset($params['include_wrapper']) ? $params['include_wrapper'] : 'no';
+        $include_wrapper = isset($params['include_wrapper']) ? $params['include_wrapper'] : 'yes';
         $output = "";
         $fieldsettings = $this->settings['options'];
 
