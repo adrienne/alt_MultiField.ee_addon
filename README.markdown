@@ -107,8 +107,7 @@ Will return the following output:
 
 The following single tag, applied to our example field above:
 
-    {my_multifield style="table" show_empty="yes" include_wrapper="no" 
-                   subfield_classes="odd|even"}
+    {my_multifield style="table" show_empty="yes" include_wrapper="no" subfield_classes="odd|even"}
     
 Will return the following output (note that `include_wrapper` is set to `no`, meaning the wrapper `<table></table>` tag is *not* returned!):
 
@@ -125,4 +124,6 @@ Will return the following output (note that `include_wrapper` is set to `no`, me
             <td class="value">YYYY-MM-DD hh:ii:ss aa</td>
         </tr>
 
-**NOTE:** Dates are output as standard MySQL dates and there is currently no built-in formatting capability. There are other plugins that will allow you to format arbitrary dates using EE format codes; use them with the tag pair syntax!
+**NOTE:** Dates are output as standard MySQL dates and there is currently no built-in formatting capability. There are other plugins that will allow you to format arbitrary dates using EE format codes; use them with the tag pair syntax! [Nice Date][1] by Low is a good choice for this. 
+
+[1]: http://devot-ee.com/add-ons/nice-date
