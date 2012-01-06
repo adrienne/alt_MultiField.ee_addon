@@ -14,7 +14,7 @@ if (!defined('FIELDTYPE_VERSION')) {
  * @copyright Copyright (c) 2011 Adrienne L. Travis
  * @license   http://creativecommons.org/licenses/by-sa/3.0/ Attribution-Share Alike 3.0 Unported
  *
- * Credit for much of the code in this fieldtype goes to Eli Van Zoeren; I shamelessly cribbed from his
+ * Thanks to Eli Van Zoeren; I shamelessly cribbed the idea and bits of the original code from his
  * VZ Address fieldtype, located here: https://github.com/elivz/vz_address.ee_addon/
  *
  */
