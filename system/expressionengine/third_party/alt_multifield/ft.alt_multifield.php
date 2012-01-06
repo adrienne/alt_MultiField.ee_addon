@@ -170,12 +170,9 @@ EOJ;
 	private function _save_settings($options = '',$styles = '') {
 		$r = array('options' => array(),'styles' => array());
 
-		$options = preg_split('/[\r\n]+/', $options);
+		$options = preg_split('/[\r\n]+/', trim($options));
 		foreach($options as &$option) {
-			// default?
-			if ($default = (substr($option, -1) == '*')) {
-				$option = substr($option, 0, -1);
-				}
+            $option = trim($option);
 			$option_parts = preg_split('/\s:\s/', $option, 3);
 			$option_name  = (string) trim($option_parts[0]);
 			$option_label = (string) trim($option_parts[1]);
