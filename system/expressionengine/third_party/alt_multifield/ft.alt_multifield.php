@@ -37,6 +37,7 @@ class Alt_multifield_ft extends EE_Fieldtype {
         parent::EE_Fieldtype();
         
         $this->EE->load->library('javascript');
+        $this->EE->load->library('typography');
         if (!function_exists('json_decode')) {
 			$this->load->library('Services_json');
             }
@@ -317,6 +318,7 @@ EOJ;
         
             // Get parameters
             $mystyle = isset($params['style']) ? $params['style'] : 'table';
+            $mymainclass = isset($params['main_class']) ? "multiblock ".$params['main_class'] : "multiblock";
             $myclasses = isset($params['subfield_classes']) ? explode('|',$params['subfield_classes']) : explode('|',"multifield");
             $show_empty = isset($params['show_empty']) ? $params['show_empty'] : 'no';
             $include_wrapper = isset($params['include_wrapper']) ? $params['include_wrapper'] : 'yes';
@@ -325,7 +327,12 @@ EOJ;
             $fieldoutputdata = array();
             foreach($multifielddata as $key=>$row) {
                 if(isset($fieldsettings[$key])) { // checks that key still exists in settings
-                    $fieldoutputdata[$key] = $row;
+                    if('textarea' == $fieldsettings[$key]['type']) { // if it's a textarea, run it through the typography class
+                        $fieldoutputdata[$key] = $this->EE->typography->auto_typography($row,TRUE);
+                        }
+                    else {
+                        $fieldoutputdata[$key] = $row;
+                        }
                     $klabel = $key.":label";
                     $ktype = $key.":type";
                     $fieldoutputdata[$klabel] = $fieldsettings[$key]['label'];
@@ -336,7 +343,7 @@ EOJ;
             // Parse the tag
             if (!$tagdata) { // Single tag
                 $myclasscopy = $myclasses;
-                $output .= ($include_wrapper == "yes") ? "<$mystyle>" : "";
+                $output .= ($include_wrapper == "yes") ? "<$mystyle class=\"$mymainclass\">" : "";
                 foreach($multifielddata as $key=>$row) {
                     if(isset($fieldsettings[$key]) && ($row != "" || $show_empty == 'yes')) { 	
                     // checks that key still exists in settings, AND that row is not empty (unless show_empty param is yes)
@@ -367,7 +374,7 @@ EOJ;
 		switch ($thing) {
                 case 'table' :
 					$returned .= "\n<tr class=\"$thingclass\">\n";
-					$returned .= "<td class=\"label\">$thinglabel</td>\n";
+					$returned .= "<th scope=\"row\" class=\"label\">$thinglabel</th>\n";
 					$returned .= "<td class=\"value\">$thingvalue</td>\n";
 					$returned .= "</tr>\n";
 					break;
