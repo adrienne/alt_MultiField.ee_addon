@@ -35,6 +35,12 @@ class Alt_multifield_ft extends EE_Fieldtype {
 	 */
 	function Alt_multifield_ft() {
         parent::EE_Fieldtype();
+        
+        $this->EE->load->library('javascript');
+        if (!function_exists('json_decode')) {
+			$this->load->library('Services_json');
+            }
+        
 
         // Create cache
         if (!isset($this->EE->session->cache[__CLASS__])) {
@@ -208,7 +214,7 @@ EOJ;
         $this->_include_css_and_js();
 		
         $form = "\n<ol class=\"alt-multifield-wrapper\" id=\"alt-multifield-$name\">";
-		$styleblock = '\n\n<style type="text/css">';
+		$styleblock = "\n\n".'<style type="text/css">';
         $fields = $this->settings['options'];
         $styles = $this->settings['styles'];
 		
@@ -220,9 +226,10 @@ EOJ;
 			}
 
         // Set default values
-        $data = unserialize(htmlspecialchars_decode($data));
-        if (!is_array($data)) $data = array();
-
+         if (!is_array($data)) {
+            $data = (isset($data)) ? $this->pre_process($data) : array();
+            }
+            
         foreach($fields as $field => $stuff) {
             $form .= '<li class="alt-multifield alt-multifield-'.$field.($is_cell ? '-cell' : '-field').' alt-multifield-box-type-'.$stuff['type'].'">';
             $form .= "\n".form_label($stuff['label'])."\n";
@@ -278,7 +285,7 @@ EOJ;
      */
     function save($data)
     {
-    	return serialize($data);
+    	return $this->EE->javascript->generate_json($data, TRUE);
     }
 
     /**
@@ -286,66 +293,74 @@ EOJ;
      */
     function save_cell($data)
     {
-        return serialize($data);
+        return $this->EE->javascript->generate_json($data, TRUE);
     }
 
 	
 	// --------------------------------------------------------------------
 	
 	/*
-	 * Pre-parse to unserialize
+	 * Pre-parse to decode from JSON
 	 */
-    function pre_process($data)
-    {
-        return unserialize(htmlspecialchars_decode($data));
-    }
+    function pre_process($data) {
+        return json_decode(htmlspecialchars_decode($data),true);
+        } // end pre_process($data)
 
     /**
      * Display Tag
      */
 	
     function replace_tag($multifielddata, $params=array(), $tagdata=FALSE) {
-	
-		$mystyle = isset($params['style']) ? $params['style'] : 'table';
-        $myclasses = isset($params['subfield_classes']) ? explode('|',$params['subfield_classes']) : explode('|',"multifield");
-        $show_empty = isset($params['show_empty']) ? $params['show_empty'] : 'no';
-        $include_wrapper = isset($params['include_wrapper']) ? $params['include_wrapper'] : 'yes';
+        // Variables
         $output = "";
         $fieldsettings = $this->settings['options'];
+        
+        // if we have data at all
+        if(is_array($multifielddata)) {
+        
+            // Get parameters
+            $mystyle = isset($params['style']) ? $params['style'] : 'table';
+            $myclasses = isset($params['subfield_classes']) ? explode('|',$params['subfield_classes']) : explode('|',"multifield");
+            $show_empty = isset($params['show_empty']) ? $params['show_empty'] : 'no';
+            $include_wrapper = isset($params['include_wrapper']) ? $params['include_wrapper'] : 'yes';
 
-		// Merge in the labels
-		$fieldoutputdata = array();
-		foreach($multifielddata as $key=>$row) {
-			if(isset($fieldsettings[$key])) { // checks that key still exists in settings
-				$fieldoutputdata[$key] = $row;
-				$klabel = $key.":label";
-                $ktype = $key.":type";
-				$fieldoutputdata[$klabel] = $fieldsettings[$key]['label'];
-				$fieldoutputdata[$ktype] = $fieldsettings[$key]['type'];
-				}
-			}
-		
-				
-        if (!$tagdata) { // Single tag
-			$myclasscopy = $myclasses;
-            $output .= ($include_wrapper == "yes") ? "<$mystyle>" : "";
-			foreach($multifielddata as $key=>$row) {
-				if(isset($fieldsettings[$key]) && ($row != "" || $show_empty == 'yes')) { 	
-				// checks that key still exists in settings, AND that row is not empty (unless show_empty param is yes)
-					$mylabel = $fieldoutputdata[$key.':label'];
-					$mytype = $fieldoutputdata[$key.':type'];
-					$myvalue = $fieldoutputdata[$key];
-					$myclass = array_shift($myclasscopy); // take OFF top class of classes array to use
-					$output .= $this->_make_something($mystyle,$mylabel,$myvalue,$myclass);
-					$myclasscopy[] = $myclass; // put used class back at END of classes array
-					}
-				}
-            $output .= ($include_wrapper == "yes") ? "</$mystyle>" : "";
-			}
-    	else { // Tag pair
-            $output = $this->EE->TMPL->parse_variables($tagdata, array($fieldoutputdata)); // Replace the variables
-			}
-
+            // Merge in the labels
+            $fieldoutputdata = array();
+            foreach($multifielddata as $key=>$row) {
+                if(isset($fieldsettings[$key])) { // checks that key still exists in settings
+                    $fieldoutputdata[$key] = $row;
+                    $klabel = $key.":label";
+                    $ktype = $key.":type";
+                    $fieldoutputdata[$klabel] = $fieldsettings[$key]['label'];
+                    $fieldoutputdata[$ktype] = $fieldsettings[$key]['type'];
+                    }
+                }
+            
+            // Parse the tag
+            if (!$tagdata) { // Single tag
+                $myclasscopy = $myclasses;
+                $output .= ($include_wrapper == "yes") ? "<$mystyle>" : "";
+                foreach($multifielddata as $key=>$row) {
+                    if(isset($fieldsettings[$key]) && ($row != "" || $show_empty == 'yes')) { 	
+                    // checks that key still exists in settings, AND that row is not empty (unless show_empty param is yes)
+                        $mylabel = $fieldoutputdata[$key.':label'];
+                        $mytype = $fieldoutputdata[$key.':type'];
+                        $myvalue = $fieldoutputdata[$key];
+                        $myclass = array_shift($myclasscopy); // take OFF top class of classes array to use
+                        $output .= $this->_make_something($mystyle,$mylabel,$myvalue,$myclass);
+                        $myclasscopy[] = $myclass; // put used class back at END of classes array
+                        }
+                    }
+                $output .= ($include_wrapper == "yes") ? "</$mystyle>" : "";
+                }
+            else { // Tag pair
+            
+                // Replace the variables
+                $output = $this->EE->TMPL->parse_variables($tagdata, array($fieldoutputdata)); 
+                
+                }
+                
+            } 
         return $output;
 		} // end function replace_tag($multifielddata, $params=array(), $tagdata=FALSE)
 
@@ -371,6 +386,8 @@ EOJ;
 		return $returned;
 		} // end private function _make_someting($item,$rowclass)
 	
+    
+    
 }
 
 /* End of file ft.alt_multifield.php */
