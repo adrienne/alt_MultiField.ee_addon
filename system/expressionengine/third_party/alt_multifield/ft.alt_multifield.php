@@ -133,7 +133,6 @@ EOJ;
 				$r .= $name;
 				$r .= ' : '.$stuff['label'];
 				$r .= ' : '.$stuff['type'];
-				if (isset($settings['default']) && $settings['default'] == $name) $r .= ' *';
 				}
 			}
 
@@ -182,9 +181,6 @@ EOJ;
 							: 'text';
 
 			$r['options'][$option_name] = array('label' => $option_label, 'type' => $option_type);
-			if ($default) {
-				$r['default'] = $option_name;
-				}
 			}
 		
 		$styles = preg_split('/\}/', $styles);
