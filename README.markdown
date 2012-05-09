@@ -154,3 +154,8 @@ codes; use them with the tag pair syntax! [Nice Date][2] by Low is a good choice
 
 [1]: http://pixelandtonic.com/
 [2]: http://devot-ee.com/add-ons/nice-date
+
+## Overview/To-Do List ##
+
+* Enable select boxes (somehow)
+* Better settings screen (I stole this one from P&T's free addons; I'd rather have it be cleaner and prettier)
