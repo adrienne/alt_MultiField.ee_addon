@@ -1,7 +1,7 @@
 <?php if (!defined('BASEPATH')) { exit('No direct script access allowed'); }
 
-// get the version info from config.php
-require PATH_THIRD . 'alt_multifield/alt_multifield_config.php';
+// get the version info from config
+require_once PATH_THIRD . 'alt_multifield/alt_multifield_config.php';
 
 /**
  * ALT MultiField Class
