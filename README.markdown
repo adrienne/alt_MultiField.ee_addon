@@ -106,10 +106,26 @@ In the case of a Matrix fieldtype, the markup would look like so (note the use o
   	       	   alt-multifield-input-type-url">
 	</li>
 
-Therefore, the following style will target your field's label:
+Therefore, the following style will target your field's elements:
 
-	.alt-multi-field-breakfast-field label {
+	.alt-multifield-breakfast-field label {
 		font-style: italic;
+	}
+	
+	.alt-multifield-breakfast-field input {
+		border: 0;
+		border-bottom: 1px solid #900;
+	}
+
+Which on the Publish page will be automatically turned into:
+
+	#alt-multifield-field_id_2 .alt-multifield-breakfast-field label {
+		font-style: italic;
+	}
+	
+	#alt-multifield-field_id_2 .alt-multifield-breakfast-field input {
+		border: 0;
+		border-bottom: 1px solid #900;
 	}
 
 **NOTE: Define one selector rule at a time to ensure the ID is correctly prefixed to each style declaration.**
