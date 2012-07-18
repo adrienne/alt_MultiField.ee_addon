@@ -101,23 +101,51 @@ EOJ;
 			}
 		} // end private function _include_css_and_js()
 	
+
+	/**
+	 * Display Cell (Matrix) Settings
+	 */
+	public function display_cell_settings($data)
+	{
+		return $this->_display_settings($data);
+	}
+
+
 	/**
 	 * Display Field Settings
 	 */
-	function display_settings($data) {
+	public function display_settings($data)
+	{
+		$rows = $this->_display_settings($data);
+		foreach($rows as $row)
+		{
+			$this->EE->table->add_row($row);
+		}
+	}
+
+	/**
+	 * Create our array of settings that are either displayed immediately or passed back for matrix ft
+	 */
+	protected function _display_settings($data)
+	{
 		// load the language file
 		$this->EE->lang->loadfile('alt_multifield');
-		$this->EE->table->add_row(
-			lang('alt_multifield_options', 'alt_multifield_options') . '<br />'
-			. lang('alt_option_setting_examples'),
-			'<textarea id="alt_multifield_options" name="alt_multifield_options" rows="12">'.$this->_options_setting($data).'</textarea>'
-			);
-		$this->EE->table->add_row(
-			lang('alt_multifield_styles', 'alt_multifield_styles') . '<br />'
-			. lang('alt_multifield_styles_examples'),
-			'<textarea id="alt_multifield_styles" name="alt_multifield_styles" rows="24">'.$this->_styles_setting($data).'</textarea>'
-			);
-		} // end function display_settings($data)
+
+		$output = array();
+
+		$output[] = array(
+			lang('alt_multifield_options', 'alt_multifield_options') . '<br />' . lang('alt_option_setting_examples'),
+			'<textarea id="alt_multifield_options" name="alt_multifield_options" rows="12">' . $this->_options_setting($data) . '</textarea>'
+		);
+
+		$output[] = array(
+			lang('alt_multifield_styles', 'alt_multifield_styles') . '<br />' . lang('alt_multifield_styles_examples'),
+			'<textarea id="alt_multifield_styles" name="alt_multifield_styles" rows="24">' . $this->_styles_setting($data) . '</textarea>'
+		);
+
+		return $output;
+
+	} // end function display_settings($data)
 	
 	/**
 	 * Options Setting Value
@@ -152,15 +180,27 @@ EOJ;
 		return $r;
 		} // end private function _styles_setting($settings)
 	
+
+
 	/**
 	 * Save Field Settings
 	 */
-	function save_settings($data) {
-		$options = $this->EE->input->post('alt_multifield_options');
-		$styles = $this->EE->input->post('alt_multifield_styles');
+	function save_cell_settings($data)
+	{
+		return $this->_save_settings($data['alt_multifield_options'],$data['alt_multifield_styles']);
+	}
+	// end function save_settings($data)
 
-		return $this->_save_settings($options,$styles);
-		} // end function save_settings($data)
+
+
+	/**
+	 * Save Field Settings
+	 */
+	function save_settings($data)
+	{
+		return $this->_save_settings($data['alt_multifield_options'],$data['alt_multifield_styles']);
+	}
+	// end function save_settings($data)
 
 	/**
 	 * Save Settings
@@ -271,6 +311,16 @@ EOJ;
 		} // end function display_field($field_data)
 	
 	// --------------------------------------------------------------------
+
+
+    /**
+     * Display Cell (Matrix)
+     */
+	function display_cell($field_data) {
+		return $this->_multi_form($this->cell_name, $field_data, TRUE);
+	}
+	// END display_cell()
+
 
     /**
      * Save Field
