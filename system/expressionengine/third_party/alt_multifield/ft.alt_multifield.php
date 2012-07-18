@@ -245,22 +245,17 @@ EOJ;
      * Generate the publish page UI
      */
     private function _multi_form($name, $data, $is_cell=FALSE) {
+
 		$this->EE->load->helper('form');
 		$this->EE->lang->loadfile('alt_multifield');
 		
         $this->_include_css_and_js();
-		
-        $form = "\n<ol class=\"alt-multifield-wrapper\" id=\"alt-multifield-$name\">";
-		$styleblock = "\n\n".'<style type="text/css">';
+
+        $dom_id = 'alt-multifield-';
+        $dom_id .= ($is_cell && isset($this->col_id)) ? $this->field_name . '-' . $this->col_id : $this->field_name;
+
+        $form = "\n<ol class=\"alt-multifield-wrapper\" id=\"$dom_id\">";
         $fields = $this->settings['options'];
-        $styles = $this->settings['styles'];
-		
-		// loop through styles and create block
-		foreach($styles as $key => $stylevalue) {
-			$styleblock .= "#alt-multifield-$name ";
-			$styleblock .= $stylevalue;
-			$styleblock .= "\n";
-			}
 
         // Set default values
          if (!is_array($data)) {
@@ -277,7 +272,7 @@ EOJ;
 				'value' => isset($data[$field]) ? $data[$field] : '',
 				'id' => $name."-".$field,
 				'class' => "alt-multifield-".$field." alt-multifield-input-type-".$stuff['type'],
-				'type' => $stuff['type'],
+				'type' => $stuff['type']
 				);
 				
             if ($stuff['type'] == 'textarea') {
@@ -301,12 +296,29 @@ EOJ;
 			}
 
 		$form .= "</ol>";
-		$styleblock .= "</style>\n\n";
+
+		$styleblock = "\n\n".'<style type="text/css">';
+        $styles = $this->settings['styles'];
 		
-		$this->EE->cp->add_to_head($styleblock);
-		
+        // only run this if a normal field, or a default matrix
+        if( ! $is_cell || $name == '{DEFAULT}')
+        {
+			// loop through styles and create block
+			foreach($styles as $key => $stylevalue) {
+
+				// combine our dom ID to help target
+				$styleblock .= "#$dom_id " . trim($stylevalue) . " \n";
+
+			}
+
+			$styleblock .= "</style>\n\n";
+			
+			$this->EE->cp->add_to_head($styleblock);
+        }
+
         return $form;
-		} // end private function _multi_form($name, $data, $is_cell=FALSE)
+	} // end private function _multi_form($name, $data, $is_cell=FALSE)
+
 
     /**
      * Display Field
