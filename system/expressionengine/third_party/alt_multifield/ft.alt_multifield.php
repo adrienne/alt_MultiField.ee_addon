@@ -1,11 +1,7 @@
 <?php if (!defined('BASEPATH')) { exit('No direct script access allowed'); }
 
-if (!defined('FIELDTYPE_VERSION')) {
-    // get the version info from config.php
-    require PATH_THIRD.'alt_multifield/alt_multifield_config.php';
-    define('FIELDTYPE_VERSION', $config['version']);
-    define('FIELDTYPE_NAME', $config['name']);
-	}
+// get the version info from config.php
+require PATH_THIRD . 'alt_multifield/alt_multifield_config.php';
 
 /**
  * ALT MultiField Class
@@ -22,12 +18,13 @@ if (!defined('FIELDTYPE_VERSION')) {
 class Alt_multifield_ft extends EE_Fieldtype {
 
     public $info = array(
-        'name'      => FIELDTYPE_NAME,
-        'version'   => FIELDTYPE_VERSION,
-		);
-    var $has_array_data = TRUE;
-	var $settings_exist = 'y';
-    var $settings = array();
+        'name'      => ALT_MULTIFIELD_NAME,
+        'version'   => ALT_MULTIFIELD_VER
+	);
+
+    public $has_array_data = TRUE;
+	public $settings_exist = 'y';
+    public $settings = array();
 
 
 	/**
