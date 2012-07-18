@@ -89,7 +89,12 @@ EOS;
 			<script type="text/javascript">
 				$(document).ready(function() {
 					$(".alt-multifield-input-type-date").datepicker( { dateFormat: $.datepicker.W3C + EE.date_obj_time } );
+
+					Matrix.bind('alt_multifield', 'display', function(cell){
+					  $(cell.dom.\$td).find(".alt-multifield-input-type-date").datepicker( { dateFormat: $.datepicker.W3C + EE.date_obj_time } );
 					});
+
+				});
 			</script>\n\n
 EOJ;
 // DO NOT INDENT THE ABOVE LINE!!!
