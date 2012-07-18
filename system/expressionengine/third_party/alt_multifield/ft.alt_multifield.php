@@ -30,8 +30,9 @@ class Alt_multifield_ft extends EE_Fieldtype {
 	/**
 	 * Fieldtype Constructor
 	 */
-	function Alt_multifield_ft() {
-        parent::EE_Fieldtype();
+	public function __construct()
+	{
+        parent::__construct();
         
         $this->EE->load->library('javascript');
         $this->EE->load->library('typography');
