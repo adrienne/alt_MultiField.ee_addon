@@ -36,10 +36,6 @@ class Alt_multifield_ft extends EE_Fieldtype {
         
         $this->EE->load->library('javascript');
         $this->EE->load->library('typography');
-        if (!function_exists('json_decode')) {
-			$this->load->library('Services_json');
-            }
-        
 
         // Create cache
         if (!isset($this->EE->session->cache[__CLASS__])) {
@@ -344,7 +340,7 @@ EOJ;
      */
     function save($data)
     {
-    	return $this->EE->javascript->generate_json($data, TRUE);
+    	return base64_encode(serialize($data));
     }
 
     /**
@@ -352,17 +348,17 @@ EOJ;
      */
     function save_cell($data)
     {
-        return $this->EE->javascript->generate_json($data, TRUE);
+        return $this->save($data);
     }
 
 	
 	// --------------------------------------------------------------------
 	
 	/*
-	 * Pre-parse to decode from JSON
+	 * Pre-parse to decode data
 	 */
     function pre_process($data) {
-        return json_decode(htmlspecialchars_decode($data),true);
+        return unserialize(base64_decode($data));
         } // end pre_process($data)
 
     /**
