@@ -271,11 +271,11 @@ EOJ;
 				'name' => $name.'['.$field.']',
 				'value' => isset($data[$field]) ? $data[$field] : '',
 				'id' => $name."-".$field,
-				'class' => "alt-multifield-".$field." alt-multifield-input-type-".$stuff['type'],
-				'type' => $stuff['type']
+				'class' => "alt-multifield-".$field." alt-multifield-input-type-".strtolower($stuff['type']),
+				'type' => strtolower($stuff['type'])
 				);
 				
-            if ($stuff['type'] == 'textarea') {
+            if ($mydata['type'] == 'textarea') {
 				// get rid of 'type' element of array
 				array_pop($mydata);
 				// add rows & columns
@@ -285,7 +285,7 @@ EOJ;
 				$form .= "\n";
 				}
             else {
-				if ($stuff['type'] == 'date') {
+				if ($mydata['type'] == 'date') {
 					// get rid of 'type' element of array
 					array_pop($mydata);
 					}
