@@ -55,6 +55,9 @@ class Alt_multifield_ft extends EE_Fieldtype {
 	 * Include the CSS styles, but only once
 	 */
 	private function _include_css_and_js() {
+// I keep waffling on whether it's better to include these in a separate file, or stick them here. 
+// This addon is supposed to be really lightweight, so at the moment they're here, but I may
+// rethink that later on!
         if ( !$this->cache['css_and_js'] ) {
 			$styling = <<<EOS
 			\n\n
@@ -133,6 +136,9 @@ EOJ;
 				$r .= $name;
 				$r .= ' : '.$stuff['label'];
 				$r .= ' : '.$stuff['type'];
+                if( $stuff['type'] == 'dropdown' && is_array($stuff['dropdown']) ) {
+                    $r .= ' : '.implode(' | ',$stuff['dropdown']);
+                    }
 				}
 			}
 
@@ -173,16 +179,26 @@ EOJ;
 		$options = preg_split('/[\r\n]+/', trim($options));
 		foreach($options as &$option) {
             $option = trim($option);
-			$option_parts = preg_split('/\s:\s/', $option, 3);
+			$option_parts = preg_split('/\s:\s/', $option, 4);
+
 			$option_name  = (string) trim($option_parts[0]);
 			$option_label = (string) trim($option_parts[1]);
-			$option_type = ( isset($option_parts[2]) && (preg_match('/^(textarea|text|tel|email|url|number|date)$/i',trim($option_parts[2])) > 0) )
+			$option_type = ( isset($option_parts[2]) && (preg_match('/^(textarea|text|tel|email|url|number|date|dropdown)$/i',trim($option_parts[2])) > 0) )
 							? (string) trim($option_parts[2])
 							: 'text';
-
+            
 			$r['options'][$option_name] = array('label' => $option_label, 'type' => $option_type);
-			}
-		
+			if($option_type == 'dropdown') {
+                if(isset($option_parts[3])) {
+                    $r['options'][$option_name]['dropdown'] = preg_split('/\s\|\s/',$option_parts[3]);
+
+                    }
+                else { // if there's no options, just change it to text.
+                    $r['options'][$option_name]['type'] = 'text';
+                    }
+                }
+            }
+
 		$styles = preg_split('/\}/', $styles);
 		array_pop($styles);
 		foreach($styles as $key => $style) {
@@ -236,20 +252,33 @@ EOJ;
 				'class' => "alt-multifield-".$field." alt-multifield-input-type-".$stuff['type'],
 				'type' => $stuff['type'],
 				);
-				
+                
             if ($stuff['type'] == 'textarea') {
 				// get rid of 'type' element of array
-				array_pop($mydata);
+				unset($mydata['type']);
 				// add rows & columns
 				$mydata['rows'] = '3';
 				$mydata['cols'] = '30';
                 $form .= form_textarea($mydata);
 				$form .= "\n";
 				}
+            else if($stuff['type'] == 'dropdown') {
+                
+                // pull name and value out 
+                $selectname = $mydata['name'];
+                $selectval  = $mydata['value'];
+                // get rid of 'type', 'name', and 'value elements of array
+				unset($mydata['type']);
+                unset($mydata['name']);
+                unset($mydata['value']);
+                // make select instead of input
+                $form .= form_dropdown($selectname,array_combine($stuff['dropdown'],$stuff['dropdown']),$selectval,$mydata);
+                $form .= "\n";
+                }
             else {
 				if ($stuff['type'] == 'date') {
 					// get rid of 'type' element of array
-					array_pop($mydata);
+					unset($mydata['type']);
 					}
 				$form .= form_input($mydata);
 				$form .= "\n";
