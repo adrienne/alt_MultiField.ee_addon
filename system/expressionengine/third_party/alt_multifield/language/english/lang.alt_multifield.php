@@ -4,16 +4,18 @@ $lang = array(
 
 'alt_multifield_options' => 'MultiField Subfields',
 'alt_option_setting_examples' => <<<EOS
-<p><tt>short_name : Field Label : type</tt></p>
+<p><tt>short_name : Field Label : type : dropdown options | (pipe-delimited)</tt></p>
 <ol style="margin-left: 2em;">
 <li><tt>short_name</tt> <strong style="color: #ff0000;">(REQUIRED)</strong> 
     follows the same conventions as a URL title</li>
 <li><tt>Field Label</tt> <strong style="color: #ff0000;">(REQUIRED)</strong> 
     is a plain text string but probably shouldn't contain quotes</li>
 <li><tt>type</tt> <em style="color: #222222; font-style: italic;">(OPTIONAL)</em> should be one of the following values:<br />
-    <tt>text</tt>, <tt>tel</tt>, <tt>email</tt>, <tt>url</tt>, <tt>number</tt>, <tt>date</tt>, or <tt>textarea</tt>.<br />
+    <tt>text</tt>, <tt>tel</tt>, <tt>email</tt>, <tt>url</tt>, <tt>number</tt>, <tt>date</tt>, <tt>textarea</tt>, or <tt>dropdown</tt>.<br />
 	(Several of these are HTML5 field types. No JS validation exists on these but modern browsers will check them for you.)<br />
 	If you do not enter a value here, it will default to <tt>text</tt>.</li>
+<li>If you create a <tt>dropdown</tt>, then add an extra colon and a string of options, delimited by ' | ' (space, pipe, space). There is currently
+    no way to have option text and values be different!
 </ol>
 EOS
 ,
