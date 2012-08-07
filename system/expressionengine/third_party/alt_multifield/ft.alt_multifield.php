@@ -382,7 +382,10 @@ EOJ;
 
             // Merge in the labels
             $fieldoutputdata = array();
+            $is_empty_test = '';
             foreach($multifielddata as $key=>$row) {
+
+            	$is_empty_test .= trim($row);
                 if(isset($fieldsettings[$key])) { // checks that key still exists in settings
                     if('textarea' == $fieldsettings[$key]['type']) { // if it's a textarea, run it through the typography class
                         $fieldoutputdata[$key] = $this->EE->typography->auto_typography($row,TRUE);
@@ -396,6 +399,9 @@ EOJ;
                     $fieldoutputdata[$ktype] = $fieldsettings[$key]['type'];
                     }
                 }
+
+            // quick is empty test
+            if($is_empty_test == '') return '';
             
             // Parse the tag
             if (!$tagdata) { // Single tag
