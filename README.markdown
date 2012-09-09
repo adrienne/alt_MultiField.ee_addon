@@ -1,5 +1,10 @@
 # ALT MultiField #
 
+## Requirements ##
+
+This addon is **not tested** with versions of PHP prior to 5.3 ! I've tried to make it compatible,
+but I cannot make any guarantees about whether it will actually work or not.
+
 ## Overview ##
 
 ALT MultiField is designed for storing smallish datasets in a compact and easily-manipulable way. 
