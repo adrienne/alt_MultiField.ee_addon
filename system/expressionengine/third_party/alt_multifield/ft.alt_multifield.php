@@ -1,55 +1,54 @@
 <?php if (!defined('BASEPATH')) { exit('No direct script access allowed'); }
 
-if (!defined('FIELDTYPE_VERSION')) {
-    // get the version info from config.php
-    require PATH_THIRD.'alt_multifield/alt_multifield_config.php';
-    define('FIELDTYPE_VERSION', $config['version']);
-    define('FIELDTYPE_NAME', $config['name']);
-	}
+// get the version info from config
+require_once PATH_THIRD . 'alt_multifield/alt_multifield_config.php';
 
 /**
- * ALT MultiField Class
- *
- * @author    Adrienne L. Travis
- * @copyright Copyright (c) 2011 Adrienne L. Travis
- * @license   http://creativecommons.org/licenses/by-sa/3.0/ Attribution-Share Alike 3.0 Unported
- *
- * Thanks to Eli Van Zoeren; I shamelessly cribbed the idea and bits of the original code from his
- * VZ Address fieldtype, located here: https://github.com/elivz/vz_address.ee_addon/
- *
- */
+* ALT MultiField Class
+*
+* @author Adrienne L. Travis
+* @copyright Copyright (c) 2011 Adrienne L. Travis
+* @license http://creativecommons.org/licenses/by-sa/3.0/ Attribution-Share Alike 3.0 Unported
+*
+* Thanks to Eli Van Zoeren; I shamelessly cribbed the idea and bits of the original code from his
+* VZ Address fieldtype, located here: https://github.com/elivz/vz_address.ee_addon/
+*
+*/
 
 class Alt_multifield_ft extends EE_Fieldtype {
 
     public $info = array(
-        'name'      => FIELDTYPE_NAME,
-        'version'   => FIELDTYPE_VERSION,
+        'name' => ALT_MULTIFIELD_NAME,
+        'version' => ALT_MULTIFIELD_VER
 		);
-    var $has_array_data = TRUE;
-	var $settings_exist = 'y';
-    var $settings = array();
+
+    public $has_array_data = TRUE;
+	public $settings_exist = 'y';
+    public $settings = array();
+
 
 
 	/**
 	 * Fieldtype Constructor
 	 */
-	function Alt_multifield_ft() {
-        parent::EE_Fieldtype();
+	public function __construct()
+	{
+        parent::__construct();
         
         $this->EE->load->library('javascript');
         $this->EE->load->library('typography');
         if (!function_exists('json_decode')) {
-			$this->load->library('Services_json');
+		$this->load->library('Services_json');
             }
         
 
         // Create cache
         if (!isset($this->EE->session->cache[__CLASS__])) {
             $this->EE->session->cache[__CLASS__] = array('css_and_js' => FALSE,);
-			}
+}
         $this->cache =& $this->EE->session->cache[__CLASS__];
 
-		} // end CONSTRUCTOR
+} // end CONSTRUCTOR
 	
 	/**
 	 * Include the CSS styles, but only once
@@ -94,7 +93,12 @@ EOS;
 			<script type="text/javascript">
 				$(document).ready(function() {
 					$(".alt-multifield-input-type-date").datepicker( { dateFormat: $.datepicker.W3C + EE.date_obj_time } );
+
+					Matrix.bind('alt_multifield', 'display', function(cell){
+					$(cell.dom.\$td).find(".alt-multifield-input-type-date").datepicker( { dateFormat: $.datepicker.W3C + EE.date_obj_time } );
 					});
+
+				});
 			</script>\n\n
 EOJ;
 // DO NOT INDENT THE ABOVE LINE!!!
@@ -106,22 +110,50 @@ EOJ;
 			}
 		} // end private function _include_css_and_js()
 	
+
+	/**
+	 * Display Cell (Matrix) Settings
+	 */
+	public function display_cell_settings($data)
+	{
+		return $this->_display_settings($data);
+	}
+
+
 	/**
 	 * Display Field Settings
 	 */
-	function display_settings($data) {
+	public function display_settings($data)
+	{
+		$rows = $this->_display_settings($data);
+		foreach($rows as $row)
+		{
+			$this->EE->table->add_row($row);
+		}
+	}
+
+	/**
+	 * Create our array of settings that are either displayed immediately or passed back for matrix ft
+	 */
+	protected function _display_settings($data)
+	{
 		// load the language file
 		$this->EE->lang->loadfile('alt_multifield');
-		$this->EE->table->add_row(
-			lang('alt_multifield_options', 'alt_multifield_options') . '<br />'
-			. lang('alt_option_setting_examples'),
+
+		$output = array();
+
+		$output[] = array(
+			lang('alt_multifield_options', 'alt_multifield_options') . '<br />' . lang('alt_option_setting_examples'),
 			'<textarea id="alt_multifield_options" name="alt_multifield_options" rows="12">'.$this->_options_setting($data).'</textarea>'
 			);
-		$this->EE->table->add_row(
-			lang('alt_multifield_styles', 'alt_multifield_styles') . '<br />'
-			. lang('alt_multifield_styles_examples'),
+
+		$output[] = array(
+			lang('alt_multifield_styles', 'alt_multifield_styles') . '<br />' . lang('alt_multifield_styles_examples'),
 			'<textarea id="alt_multifield_styles" name="alt_multifield_styles" rows="24">'.$this->_styles_setting($data).'</textarea>'
 			);
+
+		return $output;
+
 		} // end function display_settings($data)
 	
 	/**
@@ -163,12 +195,22 @@ EOJ;
 	/**
 	 * Save Field Settings
 	 */
-	function save_settings($data) {
-		$options = $this->EE->input->post('alt_multifield_options');
-		$styles = $this->EE->input->post('alt_multifield_styles');
+	function save_cell_settings($data)
+	{
+		return $this->_save_settings($data['alt_multifield_options'],$data['alt_multifield_styles']);
+	}
+	// end function save_settings($data)
 
-		return $this->_save_settings($options,$styles);
-		} // end function save_settings($data)
+
+
+	/**
+	 * Save Field Settings
+	 */
+	function save_settings($data)
+	{
+		return $this->_save_settings($data['alt_multifield_options'],$data['alt_multifield_styles']);
+	}
+	// end function save_settings($data)
 
 	/**
 	 * Save Settings
@@ -223,17 +265,11 @@ EOJ;
 		
         $this->_include_css_and_js();
 		
-        $form = "\n<ol class=\"alt-multifield-wrapper\" id=\"alt-multifield-$name\">";
-		$styleblock = "\n\n".'<style type="text/css">';
-        $fields = $this->settings['options'];
-        $styles = $this->settings['styles'];
+        $dom_id = 'alt-multifield-';
+        $dom_id .= ($is_cell && isset($this->col_id)) ? $this->field_name . '-' . $this->col_id : $this->field_name;
 		
-		// loop through styles and create block
-		foreach($styles as $key => $stylevalue) {
-			$styleblock .= "#alt-multifield-$name ";
-			$styleblock .= $stylevalue;
-			$styleblock .= "\n";
-			}
+        $form = "\n<ol class=\"alt-multifield-wrapper\" id=\"$dom_id\">";
+        $fields = $this->settings['options'];
 
         // Set default values
          if (!is_array($data)) {
@@ -249,36 +285,36 @@ EOJ;
 				'name' => $name.'['.$field.']',
 				'value' => isset($data[$field]) ? $data[$field] : '',
 				'id' => $name."-".$field,
-				'class' => "alt-multifield-".$field." alt-multifield-input-type-".$stuff['type'],
-				'type' => $stuff['type'],
+				'class' => "alt-multifield-".$field." alt-multifield-input-type-".strtolower($stuff['type']),
+				'type' => strtolower($stuff['type'])
 				);
                 
-            if ($stuff['type'] == 'textarea') {
+            if ($mydata['type'] == 'textarea') {
 				// get rid of 'type' element of array
-				unset($mydata['type']);
+				array_pop($mydata);
 				// add rows & columns
 				$mydata['rows'] = '3';
 				$mydata['cols'] = '30';
                 $form .= form_textarea($mydata);
 				$form .= "\n";
 				}
-            else if($stuff['type'] == 'dropdown') {
+            else if($mydata['type'] == 'dropdown') {
                 
                 // pull name and value out 
                 $selectname = $mydata['name'];
                 $selectval  = $mydata['value'];
-                // get rid of 'type', 'name', and 'value elements of array
-				unset($mydata['type']);
-                unset($mydata['name']);
-                unset($mydata['value']);
+
+				// convert id and class to string
+				$extrastuff = 'id="'.$mydata['id'].' class="'.$mydata['class'].'" ';
+				
                 // make select instead of input
-                $form .= form_dropdown($selectname,array_combine($stuff['dropdown'],$stuff['dropdown']),$selectval,$mydata);
+                $form .= form_dropdown($selectname,array_combine($stuff['dropdown'],$stuff['dropdown']),$selectval,$extrastuff);
                 $form .= "\n";
                 }
             else {
-				if ($stuff['type'] == 'date') {
+				if ($mydata['type'] == 'date') {
 					// get rid of 'type' element of array
-					unset($mydata['type']);
+					array_pop($mydata);
 					}
 				$form .= form_input($mydata);
 				$form .= "\n";
@@ -287,9 +323,25 @@ EOJ;
 			}
 
 		$form .= "</ol>";
+
+		$styleblock = "\n\n".'<style type="text/css">';
+        $styles = $this->settings['styles'];
+		
+        // only run this if a normal field, or a default matrix
+        if( ! $is_cell || $name == '{DEFAULT}')
+        {
+			// loop through styles and create block
+			foreach($styles as $key => $stylevalue) {
+
+				// combine our dom ID to help target
+				$styleblock .= "#$dom_id " . trim($stylevalue) . " \n";
+
+			}
+
 		$styleblock .= "</style>\n\n";
 		
 		$this->EE->cp->add_to_head($styleblock);
+        }
 		
         return $form;
 		} // end private function _multi_form($name, $data, $is_cell=FALSE)
@@ -298,10 +350,21 @@ EOJ;
      * Display Field
      */
     function display_field($field_data) {
-        return $this->_multi_form($this->field_name, $field_data);
+        // quick str_replace to fix single quote character getting escaped
+        return $this->_multi_form($this->field_name, str_replace('&#39;',"'",$field_data));
 		} // end function display_field($field_data)
 	
 	// --------------------------------------------------------------------
+
+
+    /**
+     * Display Cell (Matrix)
+     */
+	function display_cell($field_data) {
+		return $this->_multi_form($this->cell_name, $field_data, TRUE);
+	}
+	// END display_cell()
+
 
     /**
      * Save Field
@@ -350,7 +413,10 @@ EOJ;
 
             // Merge in the labels
             $fieldoutputdata = array();
+            $is_empty_test = '';
             foreach($multifielddata as $key=>$row) {
+
+            	$is_empty_test .= trim($row);
                 if(isset($fieldsettings[$key])) { // checks that key still exists in settings
                     if('textarea' == $fieldsettings[$key]['type']) { // if it's a textarea, run it through the typography class
                         $fieldoutputdata[$key] = $this->EE->typography->auto_typography($row,TRUE);
@@ -364,6 +430,9 @@ EOJ;
                     $fieldoutputdata[$ktype] = $fieldsettings[$key]['type'];
                     }
                 }
+            
+            // quick is empty test
+            if($is_empty_test == '') return '';
             
             // Parse the tag
             if (!$tagdata) { // Single tag

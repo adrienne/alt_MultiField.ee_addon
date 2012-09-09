@@ -62,7 +62,96 @@ Checkbox Groups, so it may look familiar to you. A subfield is defined as follow
 
   Note that only *modern* browsers will validate the types; no Javascript backup or shim is in place 
   to catch older browsers. Also note that the `date` type will have the standard EE Datepicker 
-  attached to it automatically.
+  attached to it automatically.  
+
+### Subfield CSS
+
+You can style each ALT MultiField by pasting CSS into the second field option. To ensure your styles target the correct subfields, all CSS rules will be prefixed with the ID of the specific field (or cell in the case of a Matrix cell).  This ID is also applied to the field's output:
+
+	<ol class="alt-multifield-wrapper"
+		id="alt-multifield-field_id_2">
+		
+		// each subfield here as an li, see below
+		
+	</ol>
+
+The basic layout of a subfield defined as `"breakfast : What is for breakfast? : url"`:
+
+    <li class="alt-multifield
+               alt-multifield-breakfast-field
+               alt-multifield-box-type-url">
+
+        <label>What is for breakfast?</label>
+
+        <input type="url"
+               name="field_id_2[breakfast]"
+               value=""
+               id="field_id_2-breakfast"
+               class="alt-multifield-breakfast alt-multifield-input-type-url" />
+    </li>
+
+In the case of a Matrix fieldtype, the markup would look like so (note the use of `-cell` instead of `-field` for the LI class value):
+
+	<li class="alt-multifield
+			   alt-multifield-breakfast-cell
+		   	   alt-multifield-box-type-url">
+
+		<label>What is for breakfast?</label>
+
+		<input type="text"
+			   name="field_id_2[row_id_123][col_id_1][breakfast]"
+		   	   value=""
+	   	       id="field_id_36[row_id_123][col_id_1]-breakfast"
+   	       	   class="alt-multifield-breakfast
+  	       	   alt-multifield-input-type-url">
+	</li>
+
+Therefore, the following style will target your field's elements:
+
+	.alt-multifield-breakfast-field label {
+		font-style: italic;
+	}
+	
+	.alt-multifield-breakfast-field input {
+		border: 0;
+		border-bottom: 1px solid #900;
+	}
+
+Which on the Publish page will be automatically turned into:
+
+	#alt-multifield-field_id_2 .alt-multifield-breakfast-field label {
+		font-style: italic;
+	}
+	
+	#alt-multifield-field_id_2 .alt-multifield-breakfast-field input {
+		border: 0;
+		border-bottom: 1px solid #900;
+	}
+
+**NOTE: Define one selector rule at a time to ensure the ID is correctly prefixed to each style declaration.**
+
+Other helpful things to note:
+
+1. Each wrapper <li> gets a class of `alt-multifield-box-type-[TYPE]`, and each input or textarea gets a class of `alt-multifield-input-type-[TYPE]`.
+1. There is also a class of `alt-multifield-[SUBFIELDNAME]-field` on each wrapper <li> if you need to style one individually. In the case of a matrix cell, the class is `alt-multifield-[SUBFIELDNAME]-cell`.
+1. If you need to style the OUTSIDE box (that is, the whole <ol>), use ` { whatever: whatever; }` (that's a blank space followed by your bracketed styles.) It's probably best to do this on the first line of the block!
+
+In the case of a Matrix fieldtype, the markup would look like this:
+
+	<li class="alt-multifield
+			   alt-multifield-breakfast-cell
+		   	   alt-multifield-box-type-url">
+
+		<label>What is for breakfast?</label>
+
+		<input type="text"
+			   name="field_id_2[row_id_123][col_id_1][breakfast]"
+		   	   value=""
+	   	       id="field_id_36[row_id_123][col_id_1]-breakfast"
+   	       	   class="alt-multifield-breakfast
+  	       	   alt-multifield-input-type-url">
+	</li>
+
 
 ## Output Info ##
 
@@ -153,7 +242,7 @@ capability. There are other plugins that will allow you to format arbitrary date
 codes; use them with the tag pair syntax! [Nice Date][2] by Low is a good choice for this. 
 
 [1]: http://pixelandtonic.com/
-[2]: http://devot-ee.com/add-ons/nice-date
+[2]: http://devot-ee.com/add-ons/nice-dat_
 
 ## Overview/To-Do List ##
 
