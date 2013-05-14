@@ -252,5 +252,6 @@ codes; use them with the tag pair syntax! [Nice Date][2] by Low is a good choice
 ## Overview/To-Do List ##
 
 * Enable select boxes (somehow)
+* Enable sorting (?) and custom filtering on output
 * Date formatting
 * Better settings screen (I stole this one from P&T's free addons; I'd rather have it be cleaner and prettier)
